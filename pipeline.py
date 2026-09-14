@@ -86,7 +86,7 @@ async def process_job(
 ) -> Path:
     wav_path = file_path.parent / f"{job_id}_audio.wav"
     transcript_path = OUTPUT_DIR / f"{job_id}_transcript.txt"
-    language = options.get("language", "ja")
+    language = options.get("language", "auto")
     want_diarize = options.get("diarize", True)
     use_assemblyai = want_diarize and bool(ASSEMBLYAI_API_KEY)
 

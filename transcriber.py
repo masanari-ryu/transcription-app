@@ -89,12 +89,14 @@ def _extract_chunk(wav_path: Path, chunk_path: Path, start_s: float, duration_s:
 
 def _transcribe_segment(audio_bytes: bytes, filename: str, language: str = "ja") -> list[dict]:
     client = get_client()
-    response = client.audio.transcriptions.create(
-        file=(filename, audio_bytes, "audio/wav"),
-        model=GROQ_WHISPER_MODEL,
-        language=language,
-        response_format="verbose_json",
-    )
+    params = {
+        "file": (filename, audio_bytes, "audio/wav"),
+        "model": GROQ_WHISPER_MODEL,
+        "response_format": "verbose_json",
+    }
+    if language != "auto":
+        params["language"] = language
+    response = client.audio.transcriptions.create(**params)
     segments = []
     for seg in (response.segments or []):
         if isinstance(seg, dict):

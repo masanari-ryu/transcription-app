@@ -70,20 +70,18 @@ async def transcribe_with_diarization(
             "percent": 12,
             "message": "話者分離付き文字起こしを開始中...",
         })
-        # speech_models は必須（universal-2 が日本語+話者分離対応）
-        # まず speaker_labels あり → なし の順で試みる
+        base_payload = {
+            "audio_url": audio_url,
+            "speech_models": ["universal-2"],
+        }
+        if language == "auto":
+            base_payload["language_detection"] = True
+        else:
+            base_payload["language_code"] = language
+
         for attempt, payload in enumerate([
-            {
-                "audio_url": audio_url,
-                "speech_models": ["universal-2"],
-                "language_code": language,
-                "speaker_labels": True,
-            },
-            {
-                "audio_url": audio_url,
-                "speech_models": ["universal-2"],
-                "language_code": language,
-            },
+            {**base_payload, "speaker_labels": True},
+            base_payload,
         ]):
             transcript_resp = await client.post(
                 f"{ASSEMBLYAI_BASE_URL}/transcript",
